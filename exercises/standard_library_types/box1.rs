@@ -18,10 +18,25 @@
 
 // I AM NOT DONE
 
+use std::clone::Clone;
+
 #[derive(PartialEq, Debug)]
-pub enum List {
-    Cons(i32, List),
+pub enum List<T: Clone + Copy> {
+    Cons(T, Box<List<T>>),
     Nil,
+}
+
+impl<T: Clone + Copy> List<T> {
+    pub fn from_vec(input_vec: Vec<T>) -> List<T> {
+        if input_vec.is_empty() {
+            List::Nil
+        } else {
+            List::Cons(
+                input_vec[0],
+                Box::new(List::from_vec((&input_vec[1..]).to_vec())),
+            )
+        }
+    }
 }
 
 fn main() {
@@ -32,12 +47,12 @@ fn main() {
     );
 }
 
-pub fn create_empty_list() -> List {
-    unimplemented!()
+pub fn create_empty_list() -> List<i32> {
+    List::Nil
 }
 
-pub fn create_non_empty_list() -> List {
-    unimplemented!()
+pub fn create_non_empty_list() -> List<i32> {
+    List::Cons(2, Box::new(List::Cons(3, Box::new(List::Nil))))
 }
 
 #[cfg(test)]
@@ -52,5 +67,23 @@ mod tests {
     #[test]
     fn test_create_non_empty_list() {
         assert_ne!(create_empty_list(), create_non_empty_list())
+    }
+
+    #[test]
+    fn test_create_empty_list_from_empty_vec() {
+        let input_vec: Vec<i32> = vec![];
+        assert_eq!(List::Nil, List::from_vec(input_vec),)
+    }
+
+    #[test]
+    fn test_create_list_from_vec() {
+        let input_vec = vec![1, 2, 3];
+        assert_eq!(
+            List::Cons(
+                1,
+                Box::new(List::Cons(2, Box::new(List::Cons(3, Box::new(List::Nil))))),
+            ),
+            List::from_vec(input_vec),
+        )
     }
 }
