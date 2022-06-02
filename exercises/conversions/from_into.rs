@@ -37,6 +37,41 @@ impl Default for Person {
 
 impl From<&str> for Person {
     fn from(s: &str) -> Person {
+        if s.len() == 0 {
+            Person::default()
+        } else {
+            let mut s_splitted = s.split(",");
+
+            let name_option = s_splitted.next();
+
+            if name_option == None || name_option == Some("") {
+                return Person::default();
+            }
+            let name = name_option.unwrap();
+
+            let age_option = s_splitted.next();
+
+            if age_option == None {
+                return Person::default();
+            }
+
+            let age_string = age_option.unwrap();
+            let age = age_string.parse::<usize>();
+
+            match age {
+                Ok(age_num) => {
+                    if s_splitted.next() == None {
+                        Person {
+                            name: String::from(name),
+                            age: age_num,
+                        }
+                    } else {
+                        Person::default()
+                    }
+                }
+                _ => Person::default(),
+            }
+        }
     }
 }
 
